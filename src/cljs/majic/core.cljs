@@ -66,10 +66,24 @@
   [:div [:p (scoring data)]
         [:p add-participant-view]])
 
+(defn update-participant [participants name k f]
+  (map #(if (= name (:name %)) (update % k f) %) participants))
+
+(defn add-points [data p1 p1-points p2 p2-points]
+  (print (update data :participants #(update-participant % p1 :points (partial + p1-points))))
+  (-> data
+      (update :participants #(update-participant % p1 :points (partial + p1-points)))
+      (update :participants #(update-participant % p2 :points (partial + p2-points)))))
+
+(defn result-buttons [player1 player2]
+  [:span
+    [:button.btn.btn-default {:on-click #(swap! data add-points player1 3 player2 0)} "1:0"]
+    [:button.btn.btn-default {:on-click #(swap! data add-points player1 0 player2 3)} "0:1"]])
+
 (defn pairings-view [data]
   [:table.pairings
     (for [[p1 p2] (generate-pairings (:participants @data))]
-      [:tr [:td.p1 (:name p1)] [:td.p2 (:name p2)]])])
+      [:tr [:td.p1 (:name p1)] [:td.p2 (:name p2)] [:td (result-buttons (:name p1) (:name p2))]])])
 
 (defn contents [data]
   [:div (participants-manager data)
