@@ -36,6 +36,9 @@
                         {:name "Sigma", :points 4},
                         {:name "Käsebrot", :points 1}]}))
 
+(defn generate-pairings [participants]
+  (partition 2 (concat participants [{:name "FREILOS"}])))
+
 (defn new-participant [name]
   {:name name, :points 0})
 
@@ -45,7 +48,7 @@
 (defn scoring [data]
   [:ol.scoring
    (for [participant (reverse (sort-by :points (:participants @data)))]
-     [scoring-item (:name participant) (:points participant)])])
+     (scoring-item (:name participant) (:points participant)))])
 
 (defn add-participant [data name]
   (if (not-empty name)
@@ -63,8 +66,17 @@
   [:div [:p (scoring data)]
         [:p add-participant-view]])
 
+(defn pairings-view [data]
+  [:table.pairings
+    (for [[p1 p2] (generate-pairings (:participants @data))]
+      [:tr [:td.p1 (:name p1)] [:td.p2 (:name p2)]])])
+
+(defn contents [data]
+  [:div (participants-manager data)
+        (pairings-view data)])
+
 (defn mount-root []
-  (reagent/render [participants-manager data] (.getElementById js/document "app")))
+  (reagent/render [contents data] (.getElementById js/document "app")))
 
 (defn init! []
   (accountant/configure-navigation!

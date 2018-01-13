@@ -32,3 +32,25 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+
+.pairings {
+    border-spacing: 0;
+}
+
+.pairings tr {
+    transition: .25s background-color;
+}
+
+.pairings tr:nth-child(even) {
+    background-color: rgb(0,0,0,.05);
+}
+
+.pairings tr:hover {
+    background-color: rgb(0,0,0,.1);
+}
+
+.pairings td.p2 {
+    text-align: right;
+    padding-left: 1em;
+}
