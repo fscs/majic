@@ -32,34 +32,21 @@
 ;; Initialize app
 
 (def data
-  (atom [{:author "Pete Hunt", :text "This is one comment"}
-         {:author "Jordan Walke", :text "This is *another* comment"}]))
+  (atom {:participants [{:name "Cyborg", :points 3},
+                        {:name "Sigma", :points 4},
+                        {:name "Käsebrot", :points 1}]}))
 
 
-(defn comment-item [author & children]
-  (into [:div.comment
-         [:h2.commentAuthor author]]
-        (map #(vector :p %) children)))
+(defn scoring-item [name points]
+  [:li (str name ": " points)])
 
-(defn comment-form []
-  [:div.commentForm
-   "Hello, world! I am a CommentForm"])
-
-(defn comment-list [data]
-  [:div.commentList
-   (for [comment @data]
-     [comment-item (:author comment) (:text comment)])])
-
-(defn comment-box []
-    ;; you can add ajax callback here
-    (fn []
-      [:div.commentBox
-       [:h1 "Comments"]
-       [comment-list data]
-       [comment-form]]))
+(defn scoring [data]
+  [:ol.scoring
+   (for [participant (reverse (sort-by :points (:participants @data)))]
+     [scoring-item (:name participant) (:points participant)])])
 
 (defn mount-root []
-  (reagent/render [comment-box data] (.getElementById js/document "app")))
+  (reagent/render [scoring data] (.getElementById js/document "app")))
 
 (defn init! []
   (accountant/configure-navigation!
