@@ -36,6 +36,8 @@
                         {:name "Sigma", :points 4},
                         {:name "Käsebrot", :points 1}]}))
 
+(defn new-participant [name]
+  {:name name, :points 0})
 
 (defn scoring-item [name points]
   [:li (str name ": " points)])
@@ -45,8 +47,24 @@
    (for [participant (reverse (sort-by :points (:participants @data)))]
      [scoring-item (:name participant) (:points participant)])])
 
+(defn add-participant [data name]
+  (if (not-empty name)
+    (update data :participants #(conj % (new-participant name)))
+    data))
+
+(def add-participant-view
+  [:div [:input {:field :text :id :new-name-input}]
+        [:button.btn.btn-default
+          {:on-click #(let [name (.-value (.getElementById js/document "new-name-input"))]
+                        (swap! data add-participant name))}
+          "Add"]])
+
+(defn participants-manager [data]
+  [:div [:p (scoring data)]
+        [:p add-participant-view]])
+
 (defn mount-root []
-  (reagent/render [scoring data] (.getElementById js/document "app")))
+  (reagent/render [participants-manager data] (.getElementById js/document "app")))
 
 (defn init! []
   (accountant/configure-navigation!
