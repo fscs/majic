@@ -1,6 +1,5 @@
 (ns majic.util)
 
-(defn foo-cljc [x]
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn generate-pairings [participants]
+  (partition 2 (concat (map :name participants) ["FREILOS"])))
+

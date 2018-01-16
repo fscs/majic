@@ -1,8 +1,8 @@
 (defproject majic "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "FIXME"
+            :url "http://FIXME.example.com"}
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [ring-server "0.5.0"]
@@ -66,7 +66,7 @@
               :optimizations :none
               :pretty-print  true}}
             :test
-            {:source-paths ["src/cljs" "src/cljc" "test/cljs"]
+            {:source-paths ["src/cljs" "src/cljc" "test/cljs" "test/majic"]
              :compiler {:main majic.doo-runner
                         :asset-path "/js/out"
                         :output-to "target/test.js"

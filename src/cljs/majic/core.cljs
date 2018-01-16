@@ -1,7 +1,8 @@
 (ns majic.core
     (:require [reagent.core :as reagent :refer [atom]]
               [secretary.core :as secretary :include-macros true]
-              [accountant.core :as accountant]))
+              [accountant.core :as accountant]
+              [majic.util :refer [generate-pairings]]))
 
 ;; -------------------------
 ;; Views
@@ -35,9 +36,6 @@
   (atom {:participants [{:name "Cyborg", :points 3},
                         {:name "Sigma", :points 4},
                         {:name "Käsebrot", :points 1}]}))
-
-(defn generate-pairings [participants]
-  (partition 2 (concat participants [{:name "FREILOS"}])))
 
 (defn new-participant [name]
   {:name name, :points 0})
@@ -83,7 +81,7 @@
 (defn pairings-view [data]
   [:table.pairings
     (for [[p1 p2] (generate-pairings (:participants @data))]
-      [:tr [:td.p1 (:name p1)] [:td.p2 (:name p2)] [:td (result-buttons (:name p1) (:name p2))]])])
+      [:tr [:td.p1 p1] [:td.p2 p2] [:td (result-buttons p1 p2)]])])
 
 (defn contents [data]
   [:div (participants-manager data)
