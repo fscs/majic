@@ -52,5 +52,9 @@ a:hover {
 
 .pairings td.p2 {
     text-align: right;
-    padding-left: 1em;
+    padding: 0 1em;
+}
+
+button.result {
+    width: 120px;
 }

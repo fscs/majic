@@ -73,15 +73,24 @@
       (update :participants #(update-participant % p1 :points (partial + p1-points)))
       (update :participants #(update-participant % p2 :points (partial + p2-points)))))
 
+(defn win-against [data winner loser]
+  (add-points data winner 3 loser 0))
+
+(defn draw [data winner loser]
+  (add-points data winner 1 loser 1))
+
+(defn result! [button data f player1 player2]
+  (swap! data f player1 player2))
+
 (defn result-buttons [player1 player2]
-  [:span
-    [:button.btn.btn-default {:on-click #(swap! data add-points player1 3 player2 0)} "1:0"]
-    [:button.btn.btn-default {:on-click #(swap! data add-points player1 0 player2 3)} "0:1"]])
+  [[:td [:button.result {:on-click #(this-as btn (result! btn data win-against player1 player2))} (str player1 " won")]]
+   [:td [:button.result {:on-click #(this-as btn (result! btn data draw player1 player2))} "draw"]]
+   [:td [:button.result {:on-click #(this-as btn (result! btn data win-against player2 player1))} (str player2 " won")]]])
 
 (defn pairings-view [data]
   [:table.pairings
     (for [[p1 p2] (generate-pairings (:participants @data))]
-      [:tr [:td.p1 p1] [:td.p2 p2] [:td (result-buttons p1 p2)]])])
+      (vec (concat [:tr [:td.p1 p1] [:td.p2 p2]] (result-buttons p1 p2))))])
 
 (defn contents [data]
   [:div (participants-manager data)
