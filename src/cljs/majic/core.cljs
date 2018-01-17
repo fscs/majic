@@ -87,10 +87,14 @@
    [:td [:button.result {:on-click #(this-as btn (result! btn data draw player1 player2))} "draw"]]
    [:td [:button.result {:on-click #(this-as btn (result! btn data win-against player2 player1))} (str player2 " won")]]])
 
-(defn pairings-view [data]
+(defn pairings-table [data]
   [:table.pairings
     (for [[p1 p2] (generate-pairings (:participants @data))]
       (vec (concat [:tr [:td.p1 p1] [:td.p2 p2]] (result-buttons p1 p2))))])
+
+(defn pairings-view [data]
+  [:div (pairings-table data)
+        [:button #_"TODO deref data earlier, save pairing + track where result entered (grey out those), enable end round once results complete" "end round"]])
 
 (defn contents [data]
   [:div (participants-manager data)
