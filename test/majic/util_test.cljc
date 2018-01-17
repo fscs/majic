@@ -30,7 +30,19 @@
                              {:name "D" :points 3 :played-against #{"C" "E"}}
                              {:name "E" :points 3 :played-against #{:bye "D"}}]))))
 
-; test for last two remaining (real) players may not be paired
+(deftest impossible-pairing-is-nil
+  (is (= nil
+         (generate-pairings [{:name "A" :points 3 :played-against #{"B"}}
+                             {:name "B" :points 0 :played-against #{"A"}}]))))
+
+(deftest worst-players-may-not-be-paired
+  (is (= [["C" "A"] ["B" "F"] ["D" "E"]]
+         (generate-pairings [{:name "A" :points 4 :played-against #{"D" "B"}}
+                             {:name "B" :points 4 :played-against #{"E" "A"}}
+                             {:name "C" :points 6 :played-against #{"F" "D"}}
+                             {:name "D" :points 3 :played-against #{"A" "C"}}
+                             {:name "E" :points 1 :played-against #{"B" "F"}}
+                             {:name "F" :points 1 :played-against #{"C" "E"}}]))))
 
 (deftest add-bye-test
   (is (= [{:name "A" :points 6 :played-against #{"E" "C"}}
