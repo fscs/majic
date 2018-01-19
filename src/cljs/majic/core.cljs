@@ -3,6 +3,7 @@
             [secretary.core :as secretary :include-macros true]
             [accountant.core :as accountant]
             [historian.core :as hist]
+            [domina.core :refer [by-id value]]
             [majic.util :refer [new-game-state add-participant pair add-result new-round]]
             [cljs.tools.reader.edn :as edn]))
 
@@ -25,9 +26,12 @@
 (def add-participant-view
   [:div [:input {:field :text :id :new-name-input}]
         [:button.btn.btn-default
-          {:on-click #(let [name (.-value (.getElementById js/document "new-name-input"))]
-                        (swap! data add-participant name))}
-          "Add"]])
+         {:on-click #(let [name-input (by-id "new-name-input")
+                           name (value name-input)]
+                       (swap! data add-participant name)
+                       (set! (.-value name-input) "")
+                       (.focus name-input))}
+         "Add"]])
 
 (defn participants-manager [participants]
   [:div [:h3 "Participants"]
@@ -85,7 +89,7 @@
           [:div.copyright "© 2018 Markus Brenneis — This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version."]]))
 
 (defn mount-root []
-  (reagent/render [contents data] (.getElementById js/document "app")))
+  (reagent/render [contents data] (by-id "app")))
 
 (defn init! []
   (accountant/configure-navigation!

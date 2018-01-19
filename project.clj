@@ -13,6 +13,7 @@
                  [compojure "1.6.0"]
                  [hiccup "1.0.5"]
                  [historian "1.1.1"]
+                 [org.clojars.magomimmo/domina "2.0.0-SNAPSHOT"]
                  [yogthos/config "1.1"]
                  [org.clojure/clojurescript "1.9.946"
                   :scope "provided"]
