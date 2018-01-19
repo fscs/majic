@@ -2,7 +2,11 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
+              [historian.core :as hist]
               [majic.util :refer [generate-pairings]]))
+
+(hist/replace-library! (atom []))
+(hist/replace-prophecy! (atom []))
 
 ;; -------------------------
 ;; Views
@@ -36,6 +40,8 @@
   (atom {:participants [{:name "Cyborg", :points 3},
                         {:name "Sigma", :points 4},
                         {:name "Käsebrot", :points 1}]}))
+
+(hist/record! data :data)
 
 (defn new-participant [name]
   {:name name, :points 0})
@@ -96,9 +102,14 @@
   [:div (pairings-table data)
         [:button #_"TODO deref data earlier, save pairing + track where result entered (grey out those), enable end round once results complete" "end round"]])
 
+(def history-view
+  [:div [:button {:on-click #(hist/undo!)} "undo"]
+        [:button {:on-click #(hist/redo!)} "redo"]])
+
 (defn contents [data]
   [:div (participants-manager data)
-        (pairings-view data)])
+        (pairings-view data)
+        history-view])
 
 (defn mount-root []
   (reagent/render [contents data] (.getElementById js/document "app")))
