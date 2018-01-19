@@ -51,9 +51,9 @@
 (defn scoring-item [name points]
   [:li (str name ": " points)])
 
-(defn scoring [data]
+(defn scoring [participants]
   [:ol.scoring
-   (for [participant (reverse (sort-by :points (:participants @data)))]
+   (for [participant (reverse (sort-by :points participants))]
      (scoring-item (:name participant) (:points participant)))])
 
 (defn add-participant [data name]
@@ -68,8 +68,9 @@
                         (swap! data add-participant name))}
           "Add"]])
 
-(defn participants-manager [data]
-  [:div [:p (scoring data)]
+(defn participants-manager [participants]
+  [:div [:h3 "Participants"]
+        [:p (scoring participants)]
         [:p add-participant-view]])
 
 (defn update-participant [participants name k f]
@@ -96,14 +97,14 @@
     (< points1 points2) [:td [:i (str player2 " won")]])])
 
 (defn pairings-table [pairings]
-  (print pairings)
   [:table.pairings
     (for [{p1 :player1 p2 :player2 result :result} pairings]
       (vec (concat [:tr [:td.p1 p1] [:td.p2 p2]]
                    (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2)))))])
 
-(defn pairings-view [pairings]
-  [:div (pairings-table pairings)
+(defn pairings-view [round pairings]
+  [:div [:h3 (str "Pairings for round " round)]
+        (pairings-table pairings)
         [:button {:on-click #(swap! data new-round)} "New pairings"]])
 
 (def history-view
@@ -111,9 +112,10 @@
         [:button {:on-click #(hist/redo!)} "redo"]])
 
 (defn contents [data]
-  [:div (participants-manager data)
-        (pairings-view (:current-pairings @data))
-        history-view])
+  (let [d @data]
+    [:div (participants-manager (:participants d))
+          (pairings-view (:current-round d) (:current-pairings d))
+          history-view]))
 
 (defn mount-root []
   (reagent/render [contents data] (.getElementById js/document "app")))
