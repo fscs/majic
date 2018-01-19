@@ -38,26 +38,27 @@
   (swap! data add-result result player1 player2))
 
 (defn result-buttons [player1 player2]
-  [[:td [:button.result {:on-click #(result! data [3 0] player1 player2)} (str player1 " won")]]
-   [:td [:button.result {:on-click #(result! data [1 1] player1 player2)} "draw"]]
-   [:td [:button.result {:on-click #(result! data [0 3] player1 player2)} (str player2 " won")]]])
+  [:span [:button.result {:on-click #(result! data [3 0] player1 player2)} (str player1 " won")]
+         [:button.result {:on-click #(result! data [1 1] player1 player2)} "draw"]
+         [:button.result {:on-click #(result! data [0 3] player1 player2)} (str player2 " won")]])
 
 (defn result-view [[points1 points2] player1 player2]
-  [(cond
-    (== points1 points2) [:td [:i "draw"]]
-    (> points1 points2) [:td [:i (str player1 " won")]]
-    (< points1 points2) [:td [:i (str player2 " won")]])])
+  (cond
+    (== points1 points2) [:i "draw"]
+    (> points1 points2) [:i (str player1 " won")]
+    (< points1 points2) [:i (str player2 " won")]))
 
 (defn pairings-table [pairings]
   [:table.pairings
     (for [{p1 :player1 p2 :player2 result :result} pairings]
-      (vec (concat [:tr [:td.p1 p1] [:td.p2 p2]]
-                   (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2)))))])
+      [:tr [:td.p1 p1]
+           [:td.p2 p2]
+           [:td (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2))]])])
 
 (defn pairings-view [round pairings]
   [:div [:h3 (str "Pairings for round " round)]
-        (pairings-table pairings)
-        [:button {:on-click #(swap! data new-round)} "New pairings"]])
+        [:button {:on-click #(swap! data new-round)} "New pairings"]
+        (pairings-table pairings)])
 
 (defn save-load!
   "Displays an input dialog with the current game state and the option to load
@@ -68,16 +69,20 @@
                                 (pr-str @data))]
     (reset! data (edn/read-string saved-state))))
 
-(def history-view
-  [:div [:button {:on-click hist/undo!} "undo"]
-        [:button {:on-click hist/redo!} "redo"]
-        [:button {:on-click save-load!} "save/restore"]])
+(def state-management-buttons
+  [:div.stateManagement
+    [:button {:on-click hist/undo!} "undo"]
+    [:button {:on-click hist/redo!} "redo"]
+    [:button {:on-click save-load!} "save/restore"]])
 
 (defn contents [data]
   (let [d @data]
-    [:div (participants-manager (:participants d))
+    [:div [:h1 "Majic"]
+          [:h2 "Magic tournament manager powered by ClojureScript and Reagent"]
+          (participants-manager (:participants d))
           (pairings-view (:current-round d) (:current-pairings d))
-          history-view]))
+          state-management-buttons
+          [:div.copyright "© 2018 Markus Brenneis — This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version."]]))
 
 (defn mount-root []
   (reagent/render [contents data] (.getElementById js/document "app")))

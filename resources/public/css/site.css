@@ -1,6 +1,6 @@
 .body-container {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding-top: 72px;
   -webkit-font-smoothing: antialiased;
@@ -12,12 +12,14 @@
 h1, h2, h3 {
   color: #000;
 }
+
 h1 {
   font-size: 2.5em
 }
 
 h2 {
-  font-size: 2em
+  font-size: 1em;
+  font-style: italic;
 }
 
 h3 {
@@ -33,9 +35,9 @@ a:hover {
   text-decoration: underline;
 }
 
-
-.pairings {
+table.pairings {
     border-spacing: 0;
+    margin: 1em 0;
 }
 
 .pairings tr {
@@ -57,4 +59,19 @@ a:hover {
 
 button.result {
     width: 120px;
+}
+
+.stateManagement {
+  margin-top: 2em;
+}
+
+.stateManagement button {
+  margin-right: 1em;
+}
+
+.copyright {
+  margin-top: 2em;
+  font-size: 50%;
+  line-height: 1.5em;
+  color: grey;
 }
