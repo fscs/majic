@@ -3,50 +3,15 @@
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
               [historian.core :as hist]
-              [majic.util :refer [pair add-result new-round]]))
+              [majic.util :refer [new-game-state add-participant pair add-result new-round]]))
 
 (hist/replace-library! (atom []))
 (hist/replace-prophecy! (atom []))
 
-;; -------------------------
-;; Views
-
-(defn home-page []
-  [:div [:h2 "Welcome to majic"]
-   [:div [:a {:href "/about"} "go to about page"]]])
-
-(defn about-page []
-  [:div [:h2 "About majic"]
-   [:div [:a {:href "/"} "go to the home page"]]])
-
-;; -------------------------
-;; Routes
-
-(defonce page (atom #'home-page))
-
-(defn current-page []
-  [:div [@page]])
-
-(secretary/defroute "/" []
-  (reset! page #'home-page))
-
-(secretary/defroute "/about" []
-  (reset! page #'about-page))
-
-;; -------------------------
-;; Initialize app
-
 (def data
-  (atom {:participants [{:name "Cyborg", :points 3, :played-against #{}}
-                        {:name "Sigma", :points 4, :played-against #{}},
-                        {:name "Käsebrot", :points 1, :played-against #{}}]
-         :current-round 0
-         :current-pairings []}))
+  (atom new-game-state))
 
 (hist/record! data :data)
-
-(defn new-participant [name]
-  {:name name, :points 0, :played-against #{}})
 
 (defn scoring-item [name points]
   [:li (str name ": " points)])
@@ -55,11 +20,6 @@
   [:ol.scoring
    (for [participant (reverse (sort-by :points participants))]
      (scoring-item (:name participant) (:points participant)))])
-
-(defn add-participant [data name]
-  (if (not-empty name)
-    (update data :participants #(conj % (new-participant name)))
-    data))
 
 (def add-participant-view
   [:div [:input {:field :text :id :new-name-input}]
@@ -72,15 +32,6 @@
   [:div [:h3 "Participants"]
         [:p (scoring participants)]
         [:p add-participant-view]])
-
-(defn update-participant [participants name k f]
-  (map #(if (= name (:name %)) (update % k f) %) participants))
-
-(defn add-points [data p1 p1-points p2 p2-points]
-  (print (update data :participants #(update-participant % p1 :points (partial + p1-points))))
-  (-> data
-      (update :participants #(update-participant % p1 :points (partial + p1-points)))
-      (update :participants #(update-participant % p2 :points (partial + p2-points)))))
 
 (defn result! [data result player1 player2]
   (swap! data add-result result player1 player2))

@@ -1,7 +1,7 @@
 (ns majic.util-test
   (:require [clojure.test :refer :all])
   (:require [majic.util :refer [pair add-bye add-result points-from-pairings apply-results pairs-from-pairings
-                                remember-opponents]]))
+                                remember-opponents new-game-state add-participant new-round]]))
 
 (deftest pairing-two-participants
   (is (= [["Bar" "Foo"]]
@@ -80,3 +80,21 @@
   (is (= [{:name "Foo" :played-against #{"Bar"}} {:name "Bar" :played-against #{"Foo"}}]
          (remember-opponents [{:name "Foo" :played-against #{}} {:name "Bar" :played-against #{}}]
                              [{:player1 "Foo" :player2 "Bar" :result [3 0]}]))))
+
+(deftest play-round-test
+  (is (= {:participants [{:name "A" :points 3 :played-against #{"B"}}
+                         {:name "B" :points 0 :played-against #{"A"}}
+                         {:name "C" :points 1 :played-against #{"D"}}
+                         {:name "D" :points 1 :played-against #{"C"}}]
+          :current-round 2
+          :current-pairings [{:player1 "A" :player2 "C" :result nil}
+                             {:player1 "D" :player2 "B" :result nil}]}
+         (-> new-game-state
+             (add-participant "A")
+             (add-participant "B")
+             (add-participant "C")
+             (add-participant "D")
+             (new-round)
+             (add-result [3 0] "A" "B")
+             (add-result [1 1] "C" "D")
+             (new-round)))))

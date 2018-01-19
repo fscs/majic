@@ -1,5 +1,18 @@
 (ns majic.util)
 
+(def new-game-state
+  {:participants []
+   :current-round 0
+   :current-pairings []})
+
+(defn new-participant [name]
+  {:name name, :points 0, :played-against #{}})
+
+(defn add-participant [data name]
+  (if (not-empty name)
+    (update data :participants #(conj % (new-participant name)))
+    data))
+
 (defn remove-by-name [participants name]
   (filter #(not= name (:name %)) participants))
 
