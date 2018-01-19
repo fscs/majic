@@ -3,7 +3,7 @@
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
               [historian.core :as hist]
-              [majic.util :refer [generate-pairings]]))
+              [majic.util :refer [pair add-result new-round]]))
 
 (hist/replace-library! (atom []))
 (hist/replace-prophecy! (atom []))
@@ -37,14 +37,16 @@
 ;; Initialize app
 
 (def data
-  (atom {:participants [{:name "Cyborg", :points 3},
-                        {:name "Sigma", :points 4},
-                        {:name "Käsebrot", :points 1}]}))
+  (atom {:participants [{:name "Cyborg", :points 3, :played-against #{}}
+                        {:name "Sigma", :points 4, :played-against #{}},
+                        {:name "Käsebrot", :points 1, :played-against #{}}]
+         :current-round 0
+         :current-pairings []}))
 
 (hist/record! data :data)
 
 (defn new-participant [name]
-  {:name name, :points 0})
+  {:name name, :points 0, :played-against #{}})
 
 (defn scoring-item [name points]
   [:li (str name ": " points)])
@@ -79,28 +81,30 @@
       (update :participants #(update-participant % p1 :points (partial + p1-points)))
       (update :participants #(update-participant % p2 :points (partial + p2-points)))))
 
-(defn win-against [data winner loser]
-  (add-points data winner 3 loser 0))
-
-(defn draw [data winner loser]
-  (add-points data winner 1 loser 1))
-
-(defn result! [button data f player1 player2]
-  (swap! data f player1 player2))
+(defn result! [data result player1 player2]
+  (swap! data add-result result player1 player2))
 
 (defn result-buttons [player1 player2]
-  [[:td [:button.result {:on-click #(this-as btn (result! btn data win-against player1 player2))} (str player1 " won")]]
-   [:td [:button.result {:on-click #(this-as btn (result! btn data draw player1 player2))} "draw"]]
-   [:td [:button.result {:on-click #(this-as btn (result! btn data win-against player2 player1))} (str player2 " won")]]])
+  [[:td [:button.result {:on-click #(result! data [3 0] player1 player2)} (str player1 " won")]]
+   [:td [:button.result {:on-click #(result! data [1 1] player1 player2)} "draw"]]
+   [:td [:button.result {:on-click #(result! data [0 3] player1 player2)} (str player2 " won")]]])
 
-(defn pairings-table [data]
+(defn result-view [[points1 points2] player1 player2]
+  [(cond
+    (== points1 points2) [:td [:i "draw"]]
+    (> points1 points2) [:td [:i (str player1 " won")]]
+    (< points1 points2) [:td [:i (str player2 " won")]])])
+
+(defn pairings-table [pairings]
+  (print pairings)
   [:table.pairings
-    (for [[p1 p2] (generate-pairings (:participants @data))]
-      (vec (concat [:tr [:td.p1 p1] [:td.p2 p2]] (result-buttons p1 p2))))])
+    (for [{p1 :player1 p2 :player2 result :result} pairings]
+      (vec (concat [:tr [:td.p1 p1] [:td.p2 p2]]
+                   (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2)))))])
 
-(defn pairings-view [data]
-  [:div (pairings-table data)
-        [:button #_"TODO deref data earlier, save pairing + track where result entered (grey out those), enable end round once results complete" "end round"]])
+(defn pairings-view [pairings]
+  [:div (pairings-table pairings)
+        [:button {:on-click #(swap! data new-round)} "New pairings"]])
 
 (def history-view
   [:div [:button {:on-click #(hist/undo!)} "undo"]
@@ -108,7 +112,7 @@
 
 (defn contents [data]
   [:div (participants-manager data)
-        (pairings-view data)
+        (pairings-view (:current-pairings @data))
         history-view])
 
 (defn mount-root []
