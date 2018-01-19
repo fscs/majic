@@ -1,9 +1,10 @@
 (ns majic.core
-    (:require [reagent.core :as reagent :refer [atom]]
-              [secretary.core :as secretary :include-macros true]
-              [accountant.core :as accountant]
-              [historian.core :as hist]
-              [majic.util :refer [new-game-state add-participant pair add-result new-round]]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [secretary.core :as secretary :include-macros true]
+            [accountant.core :as accountant]
+            [historian.core :as hist]
+            [majic.util :refer [new-game-state add-participant pair add-result new-round]]
+            [cljs.tools.reader.edn :as edn]))
 
 (hist/replace-library! (atom []))
 (hist/replace-prophecy! (atom []))
@@ -58,9 +59,19 @@
         (pairings-table pairings)
         [:button {:on-click #(swap! data new-round)} "New pairings"]])
 
+(defn save-load!
+  "Displays an input dialog with the current game state and the option to load
+  an older game state."
+  []
+  (if-let [saved-state (.prompt js/window
+                                "Copy the following text to save the current tournament state. Insert a copied state and click on OK to continue a saved tournament."
+                                (pr-str @data))]
+    (reset! data (edn/read-string saved-state))))
+
 (def history-view
-  [:div [:button {:on-click #(hist/undo!)} "undo"]
-        [:button {:on-click #(hist/redo!)} "redo"]])
+  [:div [:button {:on-click hist/undo!} "undo"]
+        [:button {:on-click hist/redo!} "redo"]
+        [:button {:on-click save-load!} "save/restore"]])
 
 (defn contents [data]
   (let [d @data]
