@@ -81,7 +81,7 @@
 (defn contents [data]
   (let [d @data]
     [:div [:h1 "Majic"]
-          [:h2 "Magic tournament manager powered by ClojureScript and Reagent"]
+          [:h2 "Tournament manager powered by ClojureScript and Reagent"]
           (participants-manager (:participants d))
           (pairings-view (:current-round d) (:current-pairings d))
           state-management-buttons
