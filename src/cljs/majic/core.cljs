@@ -7,11 +7,10 @@
             [majic.util :refer [new-game-state add-participant pair add-result new-round]]
             [cljs.tools.reader.edn :as edn]))
 
-(hist/replace-library! (atom []))
-(hist/replace-prophecy! (atom []))
-
-(def data
-  (atom new-game-state))
+(defonce data
+  (do (hist/replace-library! (atom []))
+      (hist/replace-prophecy! (atom []))
+      (atom new-game-state)))
 
 (hist/record! data :data)
 
