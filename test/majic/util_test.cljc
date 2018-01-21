@@ -1,6 +1,6 @@
 (ns majic.util-test
-  (:require [clojure.test :refer :all])
-  (:require [majic.util :refer [pair add-bye add-result points-from-pairings apply-results pairs-from-pairings
+  (:require [clojure.test :refer [deftest is]]
+            [majic.util :refer [pair add-bye add-result points-from-pairings apply-results pairs-from-pairings
                                 remember-opponents new-game-state add-participant new-round]]))
 
 (deftest pairing-two-participants

@@ -13,6 +13,7 @@
                  [compojure "1.6.0"]
                  [hiccup "1.0.5"]
                  [historian "1.1.1"]
+                 [lein-doo "0.1.8"]
                  [org.clojars.magomimmo/domina "2.0.0-SNAPSHOT"]
                  [yogthos/config "1.1"]
                  [org.clojure/clojurescript "1.9.946"
@@ -51,9 +52,9 @@
   {:builds {:min
             {:source-paths ["src/cljs" "src/cljc" "env/prod/cljs"]
              :compiler
-             {:output-to        "target/cljsbuild/public/js/app.js"
-              :output-dir       "target/cljsbuild/public/js"
-              :source-map       "target/cljsbuild/public/js/app.js.map"
+             {:output-to        "resources/public/js/app.js"
+              :output-dir       "resources/public/js"
+              :source-map       "resources/public/js/app.js.map"
               :optimizations :advanced
               :pretty-print  false}}
             :app
@@ -61,16 +62,16 @@
              :figwheel {:on-jsload "majic.core/mount-root"}
              :compiler
              {:main "majic.dev"
-              :asset-path "/js/out"
-              :output-to "target/cljsbuild/public/js/app.js"
-              :output-dir "target/cljsbuild/public/js/out"
+              :asset-path "js/out"
+              :output-to "resources/public/js/app.js"
+              :output-dir "resources/public/js/out"
               :source-map true
               :optimizations :none
               :pretty-print  true}}
             :test
             {:source-paths ["src/cljs" "src/cljc" "test/cljs" "test/majic"]
              :compiler {:main majic.doo-runner
-                        :asset-path "/js/out"
+                        :asset-path "js/out"
                         :output-to "target/test.js"
                         :output-dir "target/cljstest/public/js/out"
                         :optimizations :whitespace

@@ -32,7 +32,7 @@
           false))))
 
 
-(deftest test-home
+#_(deftest test-home
   (with-mounted-component (rc/home-page)
     (fn [c div]
       (is (found-in #"Welcome to" div)))))
