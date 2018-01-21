@@ -33,9 +33,10 @@
          "Add"]])
 
 (defn participants-manager [participants]
-  [:div [:h3 "Participants"]
-        [:p (scoring participants)]
-        [:p add-participant-view]])
+  [:section.participantsContainer
+    [:h3 "Participants"]
+    [:p (scoring participants)]
+    [:p add-participant-view]])
 
 (defn result! [data result player1 player2]
   (swap! data add-result result player1 player2))
@@ -59,9 +60,10 @@
            [:td (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2))]])])
 
 (defn pairings-view [round pairings]
-  [:div [:h3 (str "Pairings for round " round)]
-        [:button {:on-click #(swap! data new-round)} "New pairings"]
-        (pairings-table pairings)])
+  [:section.pairingsContainer
+    [:h3 (str "Pairings for round " round)]
+    [:button {:on-click #(swap! data new-round)} "New pairings"]
+    (pairings-table pairings)])
 
 (defn save-load!
   "Displays an input dialog with the current game state and the option to load
