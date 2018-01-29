@@ -95,6 +95,8 @@ table.pairings {
 
 button.result {
     width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .stateManagement {
