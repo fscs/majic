@@ -4,7 +4,7 @@
                                 remember-opponents new-game-state add-participant new-round]]))
 
 (deftest pairing-two-participants
-  (is (= [["Bar" "Foo"]]
+  (is (= [["Foo" "Bar"]]
          (pair [{:name "Foo" :points 0 :played-against #{}}
                 {:name "Bar" :points 0 :played-against #{}}]))))
 
@@ -15,8 +15,19 @@
                 {:name "C" :points 3 :played-against #{"A"}}
                 {:name "D" :points 0 :played-against #{"B"}}]))))
 
+(deftest pairings-not-completely-deterministic
+  (is (not=
+        (pair [{:name "A" :points 0 :played-against #{}}
+               {:name "B" :points 0 :played-against #{}}
+               {:name "D" :points 0 :played-against #{}}
+               {:name "C" :points 0 :played-against #{}}])
+        (pair [{:name "A" :points 0 :played-against #{}}
+               {:name "B" :points 0 :played-against #{}}
+               {:name "C" :points 0 :played-against #{}}
+               {:name "D" :points 0 :played-against #{}}]))))
+
 (deftest bye-not-twice
-  (is (= [["A" "B"] ["C" "E"] ["D" :bye]]
+  (is (= [["A" "D"] ["E" "B"] ["C" :bye]]
          (pair [{:name "A" :points 6 :played-against #{"E" "C"}}
                 {:name "B" :points 3 :played-against #{:bye "D"}}
                 {:name "C" :points 3 :played-against #{"D" "A"}}
@@ -84,16 +95,16 @@
 (deftest play-round-test
   (is (= {:participants [{:name "A" :points 3 :played-against #{"B"}}
                          {:name "B" :points 0 :played-against #{"A"}}
-                         {:name "C" :points 1 :played-against #{"D"}}
-                         {:name "D" :points 1 :played-against #{"C"}}]
+                         {:name "D" :points 1 :played-against #{"C"}}
+                         {:name "C" :points 1 :played-against #{"D"}}]
           :current-round 2
-          :current-pairings [{:player1 "A" :player2 "C" :result nil}
-                             {:player1 "D" :player2 "B" :result nil}]}
+          :current-pairings [{:player1 "A" :player2 "D" :result nil}
+                             {:player1 "C" :player2 "B" :result nil}]}
          (-> new-game-state
              (add-participant "A")
              (add-participant "B")
-             (add-participant "C")
              (add-participant "D")
+             (add-participant "C")
              (new-round)
              (add-result [3 0] "A" "B")
              (add-result [1 1] "C" "D")

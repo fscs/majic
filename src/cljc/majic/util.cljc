@@ -20,10 +20,18 @@
   (let [opponents (map :name (filter #(contains? (:played-against %) :bye) participants))]
     (conj participants {:name :bye, :played-against (set opponents), :points 0})))
 
+(defn- deterministic-shuffle
+  "Return a 'random' permutation of coll. coll is used as seed for a source of randomness."
+  [^java.util.Collection coll]
+  (let [al (java.util.ArrayList. coll)
+        rng (java.util.Random. (hash coll))]
+    (java.util.Collections/shuffle al rng)
+    (clojure.lang.RT/vector (.toArray al))))
+
 (defn- pair-even [participants]
   (case (count participants)
     0 []
-    (let [[p & ps] (reverse (sort-by :points (reverse (sort-by #(str :name %) participants))))
+    (let [[p & ps] (reverse (sort-by :points (deterministic-shuffle participants)))
           possible-opponents (filter #(not (contains? (:played-against p) %)) (map :name ps))
           rest-pairings (map #(vector [(:name p) %] (pair-even (remove-by-name ps %))) possible-opponents)
           [pair pairings] (first (filter #(not (nil? (second %))) rest-pairings))]
