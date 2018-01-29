@@ -80,6 +80,13 @@
     [:button {:on-click hist/redo!} "redo"]
     [:button {:on-click save-load!} "save/restore"]])
 
+(defn random-participants [data]
+  (clojure.string/join \newline (map :name (shuffle (:participants data)))))
+
+(def tools-buttons
+  [:div.tools
+    [:button {:on-click #(js/alert (random-participants @data))} "Random Participants"]])
+
 (defn contents [data]
   (let [d @data]
     [:div [:h1 "Majic"]
@@ -87,6 +94,7 @@
           (participants-manager (:participants d))
           (pairings-view (:current-round d) (:current-pairings d))
           state-management-buttons
+          tools-buttons
           [:div.copyright "© 2018 Markus Brenneis — This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version."]]))
 
 (defn mount-root []
