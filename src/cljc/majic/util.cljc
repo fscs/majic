@@ -21,12 +21,9 @@
     (conj participants {:name :bye, :played-against (set opponents), :points 0})))
 
 (defn- deterministic-shuffle
-  "Return a 'random' permutation of coll. coll is used as seed for a source of randomness."
-  [^java.util.Collection coll]
-  (let [al (java.util.ArrayList. coll)
-        rng (java.util.Random. (hash coll))]
-    (java.util.Collections/shuffle al rng)
-    (clojure.lang.RT/vector (.toArray al))))
+  "Return a 'random' permutation of coll in a deterministic way."
+  [coll]
+  (sort-by #(hash [coll %]) coll))
 
 (defn- pair-even [participants]
   (case (count participants)

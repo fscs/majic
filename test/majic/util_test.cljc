@@ -27,7 +27,7 @@
                {:name "D" :points 0 :played-against #{}}]))))
 
 (deftest bye-not-twice
-  (is (= [["A" "D"] ["E" "B"] ["C" :bye]]
+  (is (= [["A" "B"] ["E" "C"] ["D" :bye]]
          (pair [{:name "A" :points 6 :played-against #{"E" "C"}}
                 {:name "B" :points 3 :played-against #{:bye "D"}}
                 {:name "C" :points 3 :played-against #{"D" "A"}}
@@ -35,7 +35,7 @@
                 {:name "E" :points 3 :played-against #{"A" :bye}}]))))
 
 (deftest bye-not-twice-backtracked
-  (is (= [["A" "D"] ["B" "E"] ["C" :bye]]
+  (is (= [["A" "D"] ["C" :bye] ["E" "B"]]
          (pair [{:name "A" :points 6 :played-against #{"B" "C"}}
                 {:name "B" :points 3 :played-against #{"A" :bye}}
                 {:name "C" :points 3 :played-against #{"D" "A"}}
@@ -93,19 +93,19 @@
                              [{:player1 "Foo" :player2 "Bar" :result [3 0]}]))))
 
 (deftest play-round-test
-  (is (= {:participants [{:name "A" :points 3 :played-against #{"B"}}
-                         {:name "B" :points 0 :played-against #{"A"}}
-                         {:name "D" :points 1 :played-against #{"C"}}
-                         {:name "C" :points 1 :played-against #{"D"}}]
+  (is (= {:participants [{:name "A" :points 1 :played-against #{"D"}}
+                         {:name "B" :points 3 :played-against #{"C"}}
+                         {:name "C" :points 0 :played-against #{"B"}}
+                         {:name "D" :points 1 :played-against #{"A"}}]
           :current-round 2
-          :current-pairings [{:player1 "A" :player2 "D" :result nil}
-                             {:player1 "C" :player2 "B" :result nil}]}
+          :current-pairings [{:player1 "B" :player2 "A" :result nil}
+                             {:player1 "D" :player2 "C" :result nil}]}
          (-> new-game-state
              (add-participant "A")
              (add-participant "B")
-             (add-participant "D")
              (add-participant "C")
+             (add-participant "D")
              (new-round)
-             (add-result [3 0] "A" "B")
-             (add-result [1 1] "C" "D")
+             (add-result [3 0] "B" "C")
+             (add-result [1 1] "A" "D")
              (new-round)))))
