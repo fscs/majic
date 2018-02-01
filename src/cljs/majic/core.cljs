@@ -1,11 +1,16 @@
 (ns majic.core
-  (:require [reagent.core :as reagent :refer [atom]]
+  (:require-macros [cljs.core.async.macros :refer [go-loop]])
+  (:require [reagent.core :as reagent :refer [atom force-update-all]]
             [secretary.core :as secretary :include-macros true]
             [accountant.core :as accountant]
             [historian.core :as hist]
             [domina.core :refer [by-id value]]
             [majic.util :refer [new-game-state add-participant pair add-result new-round]]
-            [cljs.tools.reader.edn :as edn]))
+            [cljs-time.core :refer [now plus minus minutes interval in-seconds before?]]
+            [cljs.core.async :refer [<! timeout]]
+            [cljs.tools.reader.edn :as edn]
+            [goog.string :as gstring]
+            [goog.string.format]))
 
 (defonce data
   (do (hist/replace-library! (atom []))
@@ -83,13 +88,37 @@
 (defn random-participants [data]
   (clojure.string/join \newline (map :name (shuffle (:participants data)))))
 
+(defn reset-countdown [data m]
+  (assoc data :countdown-end (plus (now) (minutes m))))
+
+(defn reset-countdown! []
+  (if-let [input (js/prompt "Minutes to count down from:" 55)]
+    (swap! data reset-countdown (js/parseInt input))))
+
 (def tools-buttons
   [:div.tools
+    [:button {:on-click #(reset-countdown!)} "Countdown"] ; TODO input, reset countdown on new round
     [:button {:on-click #(js/alert (random-participants @data))} "Random Participants"]])
+
+(defn countdown-view [countdown-end]
+  (when (and (not (nil? countdown-end)) (before? (now) countdown-end))
+    (let [seconds-left (in-seconds (interval (now) countdown-end))]
+      [:div#countdown
+         {:class ["countdown" (when (<= seconds-left 0) "zero") (when (< seconds-left (* 60 5)) "low")]}
+         (quot seconds-left 60)
+         ":"
+         (gstring/format "%02d" (mod seconds-left 60))])))
+
+(defn countdown-redrawer! []
+  (go-loop []
+    (<! (timeout 1000))
+    (force-update-all)
+    (recur)))
 
 (defn contents [data]
   (let [d @data]
     [:div [:h1 "Majic"]
+          (countdown-view (:countdown-end d))
           [:h2 "Tournament manager powered by ClojureScript and Reagent"]
           (participants-manager (:participants d))
           (pairings-view (:current-round d) (:current-pairings d))
@@ -109,4 +138,5 @@
      (fn [path]
        (secretary/locate-route path))})
   (accountant/dispatch-current!)
-  (mount-root))
+  (mount-root)
+  (countdown-redrawer!))

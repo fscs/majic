@@ -42,8 +42,25 @@ a:hover {
 }
 
 h1 {
-  grid-column: 1 / 4;
+  grid-column: 1;
   grid-row: 1;
+}
+
+.countdown {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: 2em;
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: right;
+}
+
+.countdown.zero {
+  display: none;
+}
+
+.countdown.low {
+  color: red;
 }
 
 h2 {

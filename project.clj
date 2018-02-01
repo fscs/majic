@@ -6,7 +6,7 @@
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [ring-server "0.5.0"]
-                 [reagent "0.7.0"]
+                 [reagent "0.8.0-alpha2"]
                  [reagent-utils "0.2.1"]
                  [ring "1.6.3"]
                  [ring/ring-defaults "0.3.1"]
@@ -14,6 +14,7 @@
                  [hiccup "1.0.5"]
                  [historian "1.1.1"]
                  [lein-doo "0.1.8"]
+                 [com.andrewmcveigh/cljs-time "0.5.2"]
                  [org.clojars.magomimmo/domina "2.0.0-SNAPSHOT"]
                  [yogthos/config "1.1"]
                  [org.clojure/clojurescript "1.9.946"
