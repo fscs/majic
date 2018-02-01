@@ -19,6 +19,9 @@
 
 (hist/record! data :data)
 
+(defn reset-countdown [data m]
+  (assoc data :countdown-end (plus (now) (minutes m))))
+
 (defn scoring-item [name points]
   [:li (str name ": " points)])
 
@@ -30,7 +33,7 @@
 (def add-participant-view
   [:div [:input {:field :text :id :new-name-input}]
         [:button.btn.btn-default
-         {:on-click #(let [name-input (by-id "new-name-input")
+         {:on-click #(let [name-input (by-id :new-name-input)
                            name (value name-input)]
                        (swap! data add-participant name)
                        (set! (.-value name-input) "")
@@ -64,10 +67,16 @@
            [:td.p2 p2]
            [:td (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2))]])])
 
+(defn new-pairings! []
+  (if-let [round-limit (js/parseInt (.-value (by-id :round-limit)))]
+    (swap! data #(as-> % <>
+                       (new-round <>)
+                       (reset-countdown <> round-limit)))))
+
 (defn pairings-view [round pairings]
   [:section.pairingsContainer
     [:h3 (str "Pairings for round " round)]
-    [:button {:on-click #(swap! data new-round)} "New pairings"]
+    [:button {:on-click #(new-pairings!)} "New pairings"]
     (pairings-table pairings)])
 
 (defn save-load!
@@ -88,16 +97,9 @@
 (defn random-participants [data]
   (clojure.string/join \newline (map :name (shuffle (:participants data)))))
 
-(defn reset-countdown [data m]
-  (assoc data :countdown-end (plus (now) (minutes m))))
-
-(defn reset-countdown! []
-  (if-let [input (js/prompt "Minutes to count down from:" 55)]
-    (swap! data reset-countdown (js/parseInt input))))
-
 (def tools-buttons
   [:div.tools
-    [:button {:on-click #(reset-countdown!)} "Countdown"] ; TODO input, reset countdown on new round
+    [:input {:type :number :id :round-limit :defaultValue 55 :title "Round Limit" :style {"width" "40px"}}]
     [:button {:on-click #(js/alert (random-participants @data))} "Random Participants"]])
 
 (defn countdown-view [countdown-end]
