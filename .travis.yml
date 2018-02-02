@@ -1,0 +1,14 @@
+language: clojure
+
+script:
+- lein cljsbuild once
+- lein test
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  local-dir: resources/public
+  github-token: $GITHUB_PAGES_TOKEN
+  keep-history: true
+  on:
+    branch: master
