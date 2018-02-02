@@ -1,8 +1,8 @@
 (defproject majic "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "Tournament manager powered by ClojureScript and Reagent"
   :url "http://example.com/FIXME"
-  :license {:name "FIXME"
-            :url "http://FIXME.example.com"}
+  :license {:name "AGPL-3.0"
+            :url "https://www.gnu.org/licenses/agpl-3.0.html"}
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [ring-server "0.5.0"]
