@@ -23,7 +23,7 @@
   (assoc data :countdown-end (plus (now) (minutes m))))
 
 (defn scoring-item [name points]
-  [:li (str name ": " points)])
+  ^{:key name} [:li (str name ": " points)])
 
 (defn scoring [participants]
   [:ol.scoring
@@ -31,7 +31,7 @@
      (scoring-item (:name participant) (:points participant)))])
 
 (def add-participant-view
-  [:div [:input {:field :text :id :new-name-input}]
+  [:div [:input {:type :text :id :new-name-input}]
         [:button.btn.btn-default
          {:on-click #(let [name-input (by-id :new-name-input)
                            name (value name-input)]
@@ -43,16 +43,16 @@
 (defn participants-manager [participants]
   [:section.participantsContainer
     [:h3 "Participants"]
-    [:p (scoring participants)]
-    [:p add-participant-view]])
+    [:div (scoring participants)]
+    [:div add-participant-view]])
 
 (defn result! [data result player1 player2]
   (swap! data add-result result player1 player2))
 
 (defn result-buttons [player1 player2]
-  [:span [:button.result {:on-click #(result! data [3 0] player1 player2)} (str player1 " won")]
-         [:button.result {:on-click #(result! data [1 1] player1 player2)} "draw"]
-         [:button.result {:on-click #(result! data [0 3] player1 player2)} (str player2 " won")]])
+  ^{:key player1} [:span ^{:key :win1} [:button.result {:on-click #(result! data [3 0] player1 player2)} (str player1 " won")]
+                         ^{:key :draw} [:button.result {:on-click #(result! data [1 1] player1 player2)} "draw"]
+                         ^{:key :win2} [:button.result {:on-click #(result! data [0 3] player1 player2)} (str player2 " won")]])
 
 (defn result-view [[points1 points2] player1 player2]
   (cond
@@ -63,9 +63,9 @@
 (defn pairings-table [pairings]
   [:table.pairings
     (for [{p1 :player1 p2 :player2 result :result} pairings]
-      [:tr [:td.p1 p1]
-           [:td.p2 p2]
-           [:td (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2))]])])
+      ^{:key p1} [:tr ^{:key :player1} [:td.p1 p1]
+                      ^{:key :player2} [:td.p2 p2]
+                      ^{:key :result} [:td (if (nil? result) (result-buttons p1 p2) (result-view result p1 p2))]])])
 
 (defn new-pairings! []
   (if-let [round-limit (js/parseInt (.-value (by-id :round-limit)))]
