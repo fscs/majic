@@ -4,6 +4,10 @@ script:
 - lein cljsbuild once
 - lein test
 
+after_success:
+- lein cloverage --codecov
+- bash <(curl -s https://codecov.io/bash) -f target/coverage/codecov.json
+
 deploy:
   provider: pages
   skip-cleanup: true
