@@ -1,7 +1,7 @@
 (ns majic.util-test
   (:require [clojure.test :refer [deftest is]]
             [majic.util :refer [pair add-bye add-result points-from-pairings apply-results pairs-from-pairings
-                                remember-opponents new-game-state add-participant new-round]]))
+                                remember-opponents new-game-state add-participant new-round win-against-bye]]))
 
 (deftest pairing-two-participants
   (is (= [["Foo" "Bar"]]
@@ -109,3 +109,31 @@
              (add-result [3 0] "B" "C")
              (add-result [1 1] "A" "D")
              (new-round)))))
+
+(deftest bye-wins-immediately
+  (is (= {:participants [{:name "A" :points 3 :played-against #{"B"}}
+                         {:name "B" :points 0 :played-against #{"A"}}
+                         {:name "C" :points 3 :played-against #{:bye}}]
+          :current-round 2
+          :current-pairings [{:player1 "A" :player2 "C" :result nil}
+                             {:player1 :bye :player2 "B" :result [0 3]}]}
+         (-> {:participants [{:name "A" :points 0 :played-against #{}}
+                             {:name "B" :points 0 :played-against #{}}
+                             {:name "C" :points 0 :played-against #{}}]
+              :current-round 1
+              :current-pairings [{:player1 "B" :player2 "A" :result nil}
+                                 {:player1 :bye :player2 "C" :result [0 3]}]}
+             (add-result [0 3] "B" "A")
+             (new-round)))))
+
+(deftest win-against-bye-left
+  (is (= [{:player1 "A" :player2 "C" :result nil}
+          {:player1 :bye :player2 "B" :result [0 3]}]
+         (win-against-bye [{:player1 "A" :player2 "C" :result nil}
+                           {:player1 :bye :player2 "B" :result nil}]))))
+
+(deftest win-against-bye-right
+  (is (= [{:player1 "A" :player2 "C" :result nil}
+          {:player1 "B" :player2 :bye :result [3 0]}]
+         (win-against-bye [{:player1 "A" :player2 "C" :result nil}
+                           {:player1 "B" :player2 :bye :result nil}]))))

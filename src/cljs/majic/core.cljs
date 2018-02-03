@@ -5,7 +5,7 @@
             [accountant.core :as accountant]
             [historian.core :as hist]
             [domina.core :refer [by-id value]]
-            [majic.util :refer [new-game-state add-participant pair add-result new-round]]
+            [majic.util :refer [new-game-state add-participant add-result new-round]]
             [cljs-time.core :refer [now plus minus minutes interval in-seconds before?]]
             [cljs.core.async :refer [<! timeout]]
             [cljs.tools.reader.edn :as edn]
