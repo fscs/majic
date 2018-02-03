@@ -71,9 +71,17 @@
                                              (conj % (get pairs (:name participant)))
                                              %)))))
 
+(defn win-against-bye [pairings]
+  (for [pairing pairings]
+    (cond
+      (= :bye (:player1 pairing)) (assoc pairing :result [0 3])
+      (= :bye (:player2 pairing)) (assoc pairing :result [3 0])
+      :otherwise pairing)))
+
 (defn new-round [data]
   (as-> data <>
       (update <> :participants apply-results (:current-pairings <>))
       (update <> :participants remember-opponents (:current-pairings <>))
       (assoc <> :current-pairings (generate-pairings (:participants <>)))
+      (update <> :current-pairings win-against-bye)
       (update <> :current-round inc)))
