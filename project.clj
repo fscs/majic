@@ -14,7 +14,6 @@
                  [hiccup "1.0.5"]
                  [historian "1.1.1"]
                  [lein-doo "0.1.8"]
-                 [com.andrewmcveigh/cljs-time "0.5.2"]
                  [org.clojars.magomimmo/domina "2.0.0-SNAPSHOT"]
                  [yogthos/config "1.1"]
                  [org.clojure/clojurescript "1.9.946"

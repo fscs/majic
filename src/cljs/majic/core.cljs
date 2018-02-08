@@ -6,7 +6,6 @@
             [historian.core :as hist]
             [domina.core :refer [by-id value]]
             [majic.util :refer [new-game-state add-participant add-result new-round]]
-            [cljs-time.core :refer [now plus minus minutes interval in-seconds before?]]
             [cljs.core.async :refer [<! timeout]]
             [cljs.tools.reader.edn :as edn]
             [goog.string :as gstring]
@@ -19,8 +18,31 @@
 
 (hist/record! data :data)
 
-(defn reset-countdown [data m]
-  (assoc data :countdown-end (plus (now) (minutes m))))
+(defn now
+  "Returns the current time in milliseconds since epoch."
+  []
+  (.now js/Date))
+
+(defn minutes->ms
+  "Converts minutes to milliseconds"
+  [minutes]
+  (* 60 1000 minutes))
+
+(defn ms->seconds
+  "Converts milliseconds to (floored) seconds"
+  [ms]
+  (quot ms 1000))
+
+(defn timespan->str
+  "Convert a timespan to a string in MM:SS format"
+  [seconds]
+  (str
+    (quot seconds 60)
+    ":"
+    (gstring/format "%02d" (mod seconds 60))))
+
+(defn reset-countdown [data minutes]
+  (assoc data :countdown-end (+ (now) (minutes->ms minutes))))
 
 (defn scoring-item [name points]
   ^{:key name} [:li (str name ": " points)])
@@ -103,13 +125,11 @@
     [:button {:on-click #(js/alert (random-participants @data))} "Random Participants"]])
 
 (defn countdown-view [countdown-end]
-  (when (and (not (nil? countdown-end)) (before? (now) countdown-end))
-    (let [seconds-left (in-seconds (interval (now) countdown-end))]
+  (when (and (not (nil? countdown-end)) (<= (now) countdown-end))
+    (let [seconds-left (ms->seconds (- countdown-end (now)))]
       [:div#countdown
          {:class ["countdown" (when (<= seconds-left 0) "zero") (when (< seconds-left (* 60 5)) "low")]}
-         (quot seconds-left 60)
-         ":"
-         (gstring/format "%02d" (mod seconds-left 60))])))
+         (timespan->str seconds-left)])))
 
 (defn countdown-redrawer! []
   (go-loop []
